@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 
+import { getAnthropicConfig, isMockEnabled, type Env } from "@/lib/env";
 import { ConfigError, ProviderError } from "@/lib/errors";
 import { BriefSchema, INPUT_SOURCE, type Brief, type BriefRequest } from "@/lib/schemas";
 import type { SitePage } from "@/lib/site-fetcher";
@@ -23,17 +24,11 @@ export interface LlmClient {
   generate(request: LlmRequest): Promise<string>;
 }
 
-type Env = Record<string, string | undefined>;
-
-export function isMockEnabled(env: Env = process.env): boolean {
-  return env.BRIEFLY_MOCK_LLM === "1";
-}
-
 export function createLlmClient(env: Env = process.env): LlmClient {
+  // O mock tem prioridade: com ele ligado, chave e modelo não são exigidos.
   if (isMockEnabled(env)) return new MockLlmClient();
 
-  const apiKey = env.ANTHROPIC_API_KEY?.trim();
-  const model = env.ANTHROPIC_MODEL?.trim();
+  const { apiKey, model } = getAnthropicConfig(env);
   if (!apiKey) throw new ConfigError("ANTHROPIC_API_KEY não definida. Configure a variável de ambiente.");
   if (!model) throw new ConfigError("ANTHROPIC_MODEL não definida. Configure a variável de ambiente.");
 
@@ -93,7 +88,7 @@ function mapProviderError(err: unknown, model: string): Error {
 }
 
 /**
- * Mock determinístico, ativado com BRIEFLY_MOCK_LLM=1. Usa só os dados da
+ * Mock determinístico, ativado com BRIEFLY_MOCK_LLM=1 (ou "true"). Usa só os dados da
  * entrada e as URLs realmente buscadas, sem inventar fatos.
  */
 export class MockLlmClient implements LlmClient {
