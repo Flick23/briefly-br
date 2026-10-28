@@ -55,7 +55,7 @@ export class AnthropicLlmClient implements LlmClient {
     try {
       response = await this.client.messages.create({
         model: this.model,
-        max_tokens: 8_000,
+        max_tokens: 16_000,
         system,
         messages: [{ role: "user", content: user }],
         output_config: { format: OUTPUT_FORMAT },
