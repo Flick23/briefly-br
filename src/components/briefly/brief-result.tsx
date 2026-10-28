@@ -98,8 +98,10 @@ export function BriefResult({ result, companyName }: { result: BriefResponse; co
     <section aria-labelledby="brief-title" className="grid gap-4" data-testid="brief-result">
       <Card>
         <CardHeader>
-          <CardTitle id="brief-title" className="text-xl">
-            Brief: {companyName}
+          <CardTitle>
+            <h2 id="brief-title" className="text-xl">
+              Brief: {companyName}
+            </h2>
           </CardTitle>
           <CardDescription className="flex flex-wrap items-center gap-2">
             <Badge className={cn("border-transparent", CONFIDENCE_STYLES[brief.confidence])} data-testid="confidence">
@@ -124,8 +126,10 @@ export function BriefResult({ result, companyName }: { result: BriefResponse; co
             aria-labelledby={`section-${section}`}
           >
             <CardHeader>
-              <CardTitle id={`section-${section}`} className="text-base">
-                {SECTION_TITLES[section]}
+              <CardTitle>
+                <h3 id={`section-${section}`} className="text-base">
+                  {SECTION_TITLES[section]}
+                </h3>
               </CardTitle>
               <CardAction>
                 <CopyButton

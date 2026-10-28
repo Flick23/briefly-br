@@ -1,5 +1,6 @@
 import { generateBrief } from "@/lib/brief-service";
 import { PayloadTooLargeError, RateLimitError, ValidationError, toErrorResponse } from "@/lib/errors";
+import { getRateLimitPerHour } from "@/lib/env";
 import { createLlmClient } from "@/lib/llm";
 import { briefRateLimiter, getClientIp } from "@/lib/rate-limit";
 import { BriefRequestSchema } from "@/lib/schemas";
@@ -31,7 +32,7 @@ export async function POST(request: Request): Promise<Response> {
     // Antes do rate limit: servidor mal configurado não deve consumir a cota do usuário.
     const llm = createLlmClient();
 
-    const limit = briefRateLimiter.check(getClientIp(request.headers));
+    const limit = briefRateLimiter.check(getClientIp(request.headers), getRateLimitPerHour());
     if (!limit.allowed) throw new RateLimitError(limit.retryAfterSeconds);
 
     const result = await generateBrief(parsed.data, { llm });

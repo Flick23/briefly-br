@@ -22,6 +22,14 @@ export function getAnthropicConfig(env: Env = process.env): { apiKey?: string; m
   return { apiKey: clean(env.ANTHROPIC_API_KEY), model: clean(env.ANTHROPIC_MODEL) };
 }
 
+export const DEFAULT_BRIEFS_PER_HOUR = 10;
+
+/** Limite de briefs por hora por IP. Padrão 10; BRIEFLY_RATE_LIMIT_PER_HOUR só para ambientes de teste. */
+export function getRateLimitPerHour(env: Env = process.env): number {
+  const parsed = Number.parseInt(clean(env.BRIEFLY_RATE_LIMIT_PER_HOUR) ?? "", 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_BRIEFS_PER_HOUR;
+}
+
 /** Diagnóstico seguro: só booleanos e o commit curto, nunca valores de variáveis. */
 export function getHealth(env: Env = process.env) {
   const { apiKey, model } = getAnthropicConfig(env);

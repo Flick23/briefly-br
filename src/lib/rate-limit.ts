@@ -12,7 +12,8 @@ export interface RateLimitResult {
 }
 
 export interface RateLimiter {
-  check(key: string): RateLimitResult;
+  /** `limit` sobrescreve o limite padrão do limiter nesta checagem. */
+  check(key: string, limit?: number): RateLimitResult;
   reset(): void;
 }
 
@@ -28,12 +29,13 @@ export function createRateLimiter({
   const hits = new Map<string, number[]>();
 
   return {
-    check(key) {
+    check(key, limitOverride) {
+      const max = limitOverride ?? limit;
       const current = now();
       const windowStart = current - windowMs;
       const recent = (hits.get(key) ?? []).filter((timestamp) => timestamp > windowStart);
 
-      if (recent.length >= limit) {
+      if (recent.length >= max) {
         hits.set(key, recent);
         const retryAfterMs = recent[0] + windowMs - current;
         return { allowed: false, remaining: 0, retryAfterSeconds: Math.max(1, Math.ceil(retryAfterMs / 1000)) };
@@ -49,7 +51,7 @@ export function createRateLimiter({
         }
       }
 
-      return { allowed: true, remaining: limit - recent.length, retryAfterSeconds: 0 };
+      return { allowed: true, remaining: max - recent.length, retryAfterSeconds: 0 };
     },
     reset() {
       hits.clear();
@@ -59,7 +61,7 @@ export function createRateLimiter({
 
 export const BRIEF_RATE_LIMIT = { limit: 10, windowMs: 60 * 60 * 1000 } as const;
 
-/** Limiter compartilhado pela rota de briefs: 10 por hora por IP. */
+/** Limiter compartilhado pela rota de briefs: 10 por hora por IP (a rota passa o limite lido do ambiente). */
 export const briefRateLimiter = createRateLimiter(BRIEF_RATE_LIMIT);
 
 /** IP do cliente. Na Vercel, `x-forwarded-for` é definido pela plataforma. */

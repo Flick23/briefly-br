@@ -65,3 +65,12 @@ describe("getHealth", () => {
     vi.unstubAllEnvs();
   });
 });
+
+describe("getRateLimitPerHour", () => {
+  it("usa 10 por padrão e ignora valores inválidos", async () => {
+    const { getRateLimitPerHour } = await import("@/lib/env");
+    expect(getRateLimitPerHour({})).toBe(10);
+    for (const value of ["", "abc", "0", "-5"]) expect(getRateLimitPerHour({ BRIEFLY_RATE_LIMIT_PER_HOUR: value })).toBe(10);
+    expect(getRateLimitPerHour({ BRIEFLY_RATE_LIMIT_PER_HOUR: " 1000 " })).toBe(1000);
+  });
+});

@@ -23,3 +23,13 @@ describe("getClientIp", () => {
     expect(getClientIp(new Headers())).toBe("unknown");
   });
 });
+
+describe("limite por checagem", () => {
+  it("o limite passado na checagem sobrescreve o padrão", () => {
+    const limiter = createRateLimiter({ limit: 1, windowMs: 1_000, now: () => 0 });
+    expect(limiter.check("a", 3).allowed).toBe(true);
+    expect(limiter.check("a", 3).allowed).toBe(true);
+    expect(limiter.check("a", 3)).toMatchObject({ allowed: true, remaining: 0 });
+    expect(limiter.check("a", 3).allowed).toBe(false);
+  });
+});

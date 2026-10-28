@@ -20,6 +20,6 @@ export default defineConfig({
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !isCI,
     timeout: 180_000,
-    env: { BRIEFLY_MOCK_LLM: "1" },
+    env: { BRIEFLY_MOCK_LLM: "1", BRIEFLY_RATE_LIMIT_PER_HOUR: "1000" },
   },
 });
