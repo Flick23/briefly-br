@@ -29,7 +29,12 @@ export async function generateBrief(input: BriefRequest, deps: BriefServiceDeps 
     if (result.ok) {
       return {
         brief: enforceGrounding(result.brief, site),
-        meta: { site: site.status, pages: site.pages.map((page) => page.url), mock: llm.mock },
+        meta: {
+          site: site.status,
+          ...(site.failureReason ? { siteError: site.failureReason } : {}),
+          pages: site.pages.map((page) => page.url),
+          mock: llm.mock,
+        },
       };
     }
 

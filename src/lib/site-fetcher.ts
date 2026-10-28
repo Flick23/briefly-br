@@ -5,7 +5,9 @@ import net from "node:net";
 import zlib from "node:zlib";
 import type { Readable } from "node:stream";
 
-import type { SiteStatus } from "@/lib/schemas";
+import type { SiteFailureReason, SiteStatus } from "@/lib/schemas";
+
+export type { SiteFailureReason };
 
 /**
  * Busca e limpa o texto do site do prospect, com proteção contra SSRF:
@@ -68,16 +70,6 @@ export function isBlockedAddress(address: string): boolean {
   if (family === 6) return blockedV6.check(ip, "ipv6");
   return true;
 }
-
-export type SiteFailureReason =
-  | "invalid_url"
-  | "blocked_host"
-  | "timeout"
-  | "too_large"
-  | "http_status"
-  | "unsupported_content"
-  | "too_many_redirects"
-  | "network";
 
 export class SiteFetchError extends Error {
   constructor(

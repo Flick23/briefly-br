@@ -154,7 +154,17 @@ export type Brief = z.output<typeof BriefSchema>;
 
 export type SiteStatus = "ok" | "skipped" | "failed";
 
+export type SiteFailureReason =
+  | "invalid_url"
+  | "blocked_host"
+  | "timeout"
+  | "too_large"
+  | "http_status"
+  | "unsupported_content"
+  | "too_many_redirects"
+  | "network";
+
 export interface BriefResponse {
   brief: Brief;
-  meta: { site: SiteStatus; pages: string[]; mock: boolean };
+  meta: { site: SiteStatus; siteError?: SiteFailureReason; pages: string[]; mock: boolean };
 }

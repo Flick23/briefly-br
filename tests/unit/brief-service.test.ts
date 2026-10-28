@@ -62,7 +62,7 @@ describe("generateBrief", () => {
     const llm = fakeLlm(JSON.stringify(makeBrief({ confidence: "alta" })));
     const result = await generateBrief(input, { llm, fetchSite: siteFailed });
     expect(result.brief.confidence).toBe("baixa");
-    expect(result.meta.site).toBe("failed");
+    expect(result.meta).toMatchObject({ site: "failed", siteError: "timeout" });
   });
 
   it("faz uma nova tentativa quando a saída é inválida, enviando o erro de volta", async () => {
